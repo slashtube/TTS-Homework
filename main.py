@@ -1,6 +1,7 @@
 import argoscuolanext
 import datetime
-import pyttsx3
+import requests
+from playsound import playsound
 from colorama import Fore, init
 import readchar
 import os
@@ -18,24 +19,30 @@ def get_indexes(d: list, date: str):
     return indexes
 
 
+def roberto_say(text: str):
+    token = 'Fa2MnqtGsYQkUwhPYrR79qjgmqF5ai42'
+    host = 'https://restroberto.thetipo01.cf'
+
+    x = requests.get(host + '/audio', params={'token': token, 'text': text})
+    playsound(host + str(x.content.decode()))
+
+
 # Returns the desired homeworks 
 def get_homeworks(dati, ind: list):
-    # Initialize tts engine
-    engine = pyttsx3.init()
-    # Set properties
-    engine.setProperty('rate', 125)
-    engine.setProperty('voice', 'italian')
-    print(ind)
     for i in ind:
+        print("Docente: ")
+        roberto_say("Docente: ")
         print(dati[i]['docente'])
+        roberto_say(dati[i]['docente'])
+
+        print("Materia: ")
+        roberto_say("Materia")
         print(dati[i]['desMateria'])
-        engine.say(dati[i]['desMateria'])
+        roberto_say(dati[i]['desMateria'])
 
         print(dati[i]['desCompiti'])
-        engine.say(dati[i]['desCompiti'])
+        roberto_say(dati[i]['desCompiti'])
         print("\n")
-        engine.runAndWait()
-    engine.stop()
 
 
 # Gets the days of the current week
@@ -69,7 +76,9 @@ def get_nextdays():
     curday = datetime.date.today().strftime("%A")
     nextdays = []
     i = 0
-    if curday != "Monday":
+    if curday != "Monday" or curday == "Monday":
+        if curday == "Monday":
+            curday = "Tuesday"
         while curday != "Monday":
             i += 1
             temp = datetime.date.today() + datetime.timedelta(days=i)
@@ -87,16 +96,18 @@ def get_nextdays():
 # Logs into the ER, finds and eventually says the school homeworks
 def say_homeworks(data):
     # ER Access Data
-    session = argoscuolanext.Session("ssxxxxx", "username", "password")
+    session = argoscuolanext.Session("ssxxxx", "username", "password")
     # Get homeworks
     compiti = session.compiti()
     dati = compiti['dati']
     # Finds the indexes of tomorrow's date
     indici = get_indexes(dati, data)
     if not indici:
-        print("\n\nNon ci sono compiti per {0}".format(data))
+        print("\n\nNon ci sono compiti per {0}".format(data.split(" ", 1)[1]))
+        roberto_say("Non ci sono compiti per il {1}" + data.split(" ", 1)[1])
     else:
-        print("\n\nCompiti per {0}".format(data))
+        print("\n\nCompiti per {0}".format(data.split(" ", 1)[1]))
+        roberto_say("Compiti per il:" + data.split(" ", 1)[1])
         get_homeworks(dati, indici)
 
 
@@ -106,10 +117,11 @@ def main():
     nextdays = get_nextdays()  # Gets list of the days of the next week
     selectiony = 0  # This variable is used to keep trace of the selected choice, it is indeed used as index
     selectionx = 0  # This variable is used to switch through the tables
-    prevy = 0  #
+    prevy = 0  # Holds the previous value of selectiony
     init(autoreset=True)  # Sets autoreset at every print
     while True:
-        print("\t\t\tMENU RICHIESTA COMPITI\n")
+        print("\t\t\tMENU RICHIESTA COMPITI \n")
+        print(Fore.CYAN + "GIORNI RIMANENTI\t\t\tGIORNI DELLA PROSSIMA SETTIMANA")
         j = 0
         i = 0
         while j != 6:
@@ -121,7 +133,7 @@ def main():
                 j += 1
             else:  # Second case: curdays[] has elements
                 try:
-                    if j > dim:  # Prints the days in the same row
+                    if j < dim:  # Prints the days in the same row
                         # Selection system
                         if selectionx == 0 and selectiony == i:
                             print(Fore.GREEN + curdays[selectiony] + Fore.RESET + "\t\t\t" + nextdays[j])
@@ -177,7 +189,10 @@ def main():
             elif selectionx == 1:  # Otherwise if he's in second column
                 date = nextdays[selectiony]
                 say_homeworks(date)
+            roberto_say("\nPremi un tasto per continuare...")
             input()
+        else:
+            break
         os.system("clear")
 
 
