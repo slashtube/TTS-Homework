@@ -7,6 +7,11 @@ Text-to-speech program to check the homework for a specific day using the ArgoSc
 - [requests](https://pypi.org/project/requests/)
 - [playsound](https://pypi.org/project/playsound/)
 - [colorama](https://pypi.org/project/colorama/)
+- [dotenv](https://pypi.org/project/python-dotenv/)
+- [readchar](https://pypi.org/project/readchar/)
+
+## Installation
+``pip install -r requirements.txt``
 
 ## Usage
-Edit the main.py file and insert your ER credentials in the Session() call at line 99.
+Insert your credentials in the config.env file and execute the main.py

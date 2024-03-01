@@ -5,6 +5,24 @@ from playsound import playsound
 from colorama import Fore, init
 import readchar
 import os
+from dotenv import load_dotenv
+
+token = ""
+host = ""
+username = ""
+password = ""
+code = ""
+
+
+# Gets the required variables from the .env file
+def load_env():
+    load_dotenv()
+    token = os.getenv('TOKEN')
+    host = os.getenv('HOST')
+    username = os.getenv('USERNAME')
+    password = os.getenv('PASSWORD')
+    code = os.getenv('SCHOOL_CODE')
+
 
 
 # Returns the indexes of the searched days
@@ -20,9 +38,6 @@ def get_indexes(d: list, date: str):
 
 
 def roberto_say(text: str):
-    token = 'Fa2MnqtGsYQkUwhPYrR79qjgmqF5ai42'
-    host = 'https://restroberto.thetipo01.cf'
-
     x = requests.get(host + '/audio', params={'token': token, 'text': text})
     playsound(host + str(x.content.decode()))
 
@@ -112,6 +127,7 @@ def say_homeworks(data):
 
 
 def main():
+    load_env() # loads env variables from local .env file
     curdays = get_curdays()  # Gets list of remaining days of the week
     dim = len(curdays)  # Dimension of curdays[]
     nextdays = get_nextdays()  # Gets list of the days of the next week
